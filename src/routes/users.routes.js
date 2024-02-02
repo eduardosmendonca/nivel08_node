@@ -1,17 +1,29 @@
 const { Router } = require("express");
 
+
+const UsersController = require("../controllers/UsersController")
+
 const userRoutes = Router();
 
-userRoutes.post("/", (request, response) => {
-    const{ name, email, password } = request.body;
+/* 
+// Middlewares - é um segurança das requisições - faz o filtro de usuário - permissões
+function myMyddleware (request, response, next){ 
+    console.log("passou pelo middleware");
+    if(!request.body.isAdmin){
+        return response.json({ message: "user unauthorized" });
+    };
 
-    // response.send(`
-    //     Usuário: ${name},
-    //     Email: ${email},
-    //     Password: ${password}        
-    // `);
+    next();
+}
+*/
 
-    response.json( {name, email, password} );
-});
+const usersController = new UsersController();
+
+/*
+userRoutes.use(myMyddleware); // dessa maneira passa o myddleware para todas as rotas
+userRoutes.post("/", myMyddleware, usersController.create); // dessa maneira somente essa rote tem o middleware
+ */
+
+userRoutes.post("/", usersController.create);
 
 module.exports = userRoutes;
