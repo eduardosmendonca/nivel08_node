@@ -3,7 +3,7 @@ const { Router } = require("express");
 
 const UsersController = require("../controllers/UsersController")
 
-const userRoutes = Router();
+const usersRoutes = Router();
 
 /* 
 // Middlewares - é um segurança das requisições - faz o filtro de usuário - permissões
@@ -24,6 +24,7 @@ userRoutes.use(myMyddleware); // dessa maneira passa o myddleware para todas as 
 userRoutes.post("/", myMyddleware, usersController.create); // dessa maneira somente essa rote tem o middleware
  */
 
-userRoutes.post("/", usersController.create);
+usersRoutes.post("/", usersController.create);
+usersRoutes.put("/:id", usersController.update);
 
-module.exports = userRoutes;
+module.exports = usersRoutes;
