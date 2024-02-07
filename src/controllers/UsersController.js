@@ -9,7 +9,7 @@
     controller > routes > server > cliente
 */
 
-const { hash } = require("bcryptjs");
+const { hash, compare } = require("bcryptjs");
 
 const AppError = require("../utils/AppError");
 
@@ -70,20 +70,31 @@ class UsersController {
             throw new AppError("Este email já está em uso.");
         }
 
-        user.name = name;
-        user.email = email;
+        user.name = name ?? user.name;
+        user.email = email ?? user.email;
 
         if(password && !old_password){
-            throw new AppError("Voce precisa informar a senha antiga para definir a nova senha!")
+            throw new AppError("Voce precisa informar a senha antiga para definir a nova senha!");
+        }
+
+        if (password && old_password){
+            const checkOldPassword = await compare(old_password, user.password);
+
+            if(!checkOldPassword){
+                throw new AppError("A senha antiga não confere");
+            }
+
+            user.password = await hash(password, 8);
         }
 
         await database.run(`
             UPDATE users SET 
             name = ?, 
             email = ?, 
-            updated_at = ?
+            password = ?,
+            updated_at = DATETIME('now')
             WHERE id = ?`, 
-            [user.name, user.email, new Date(), id]
+            [user.name, user.email, user.password, id]
         );
 
         return response.json();
